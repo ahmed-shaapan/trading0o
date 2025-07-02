@@ -6,12 +6,14 @@ import pandas as pd
 import sqlalchemy
 import os
 from dotenv import load_dotenv
+
+# Load environment variables (Railway will provide these)
 load_dotenv()
 
 # --- Database Setup ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set. Make sure you have a .env file.")
+    raise ValueError("DATABASE_URL environment variable is not set. Make sure you have set it in Railway.")
 
 # Fix for deprecated postgres:// URL format
 if DATABASE_URL.startswith('postgres://'):
@@ -50,7 +52,7 @@ ticker_color_map = {ticker: TICKER_COLORS[i % len(TICKER_COLORS)] for i, ticker 
 
 # App initialization
 app = dash.Dash(__name__)
-server = app.server  # This is crucial for Vercel deployment
+server = app.server  # This is crucial for Railway deployment
 
 app.layout = html.Div([
     # Main Content Area
@@ -474,6 +476,9 @@ def update_signals_table(signals):
 def update_profitable_trades_table(trades):
     return trades
 
-# This is required for Vercel
+# This is required for Railway deployment
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    # Get port from environment variable (Railway provides this)
+    port = int(os.environ.get('PORT', 8050))
+    # Run the server
+    app.run_server(debug=False, host='0.0.0.0', port=port)
